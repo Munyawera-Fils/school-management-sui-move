@@ -26,7 +26,7 @@ The School Management Smart Contract can be deployed on a blockchain network sup
 Contributions to the project are welcome! You can contribute by testing the smart contract, reporting bugs, or suggesting improvements. Fork the repository, make your changes, and submit a pull request.
 
  # Installation
-Follow these steps to deploy and use the Hospital Management System:
+Follow these steps to deploy and use the School Management System:
 
 Move Compiler Installation: Ensure you have the Move compiler installed. Refer to the Sui documentation for installation instructions.
 

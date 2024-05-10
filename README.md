@@ -14,7 +14,7 @@ Academic Records: Stores academic records such as grades, exam results, and clas
 
 User Permissions: Implements role-based access control, allowing administrators, teachers, and students to access specific functionalities based on their roles.
 
-Testing Environment: Provides a testing environment with predefined scenarios for testing the functionality of the smart contract.
+Testing Environment: Provides a testing environment with predefined scenarios for testing the functionality of the smart contract. 
 Usage:
 
 

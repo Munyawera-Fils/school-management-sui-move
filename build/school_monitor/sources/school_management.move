@@ -39,7 +39,7 @@ module school_monitor::school_management {
         school: ID,
         name: String,
         age: u64,
-        gender: u8,
+        gender: u8, // Using u8 for gender, consider expanding for inclusivity
         contact_info: String,
         admission_date: u64,
         fees_paid: bool
@@ -72,9 +72,9 @@ module school_monitor::school_management {
         (school, cap)
     }
 
-    // // Enroll a student
+    // Enroll a student
     public fun enroll_student(school: ID, name: String, age: u64, gender: u8, contact_info: String, date: u64, c: &Clock, ctx: &mut TxContext): Student {
-        assert!(gender == 0 || gender == 1, ERROR_INVALID_GENDER);
+        assert!(gender == MALE || gender == FEMALE, ERROR_INVALID_GENDER); // Checking gender against constants
         Student {
             id: object::new(ctx),
             school,
@@ -98,15 +98,13 @@ module school_monitor::school_management {
         table::add(&mut school.fees, sender(ctx), fee);
     }
 
-    // // Pay fee
+    // Pay fee
     public fun pay_fee(school: &mut School, student: &mut Student, coin: Coin<SUI>, c: &Clock, ctx: &mut TxContext) {
-        let fee = table::remove(&mut school.fees, sender(ctx));
+        let fee = table::remove(&mut school.fees, student.id); // Removing fee based on student id
         assert!(coin::value(&coin) == fee.amount, ERROR_INSUFFICIENT_FUNDS);
         assert!(fee.payment_date < timestamp_ms(c), ERROR_INVALID_TIME);
-        // join the balance 
         let balance_ = coin::into_balance(coin);
         balance::join(&mut school.balance, balance_);
-        // fee paid
         student.fees_paid = true;
     }
 
@@ -117,7 +115,7 @@ module school_monitor::school_management {
         coin_
     }
 
-    // // =================== Public view functions ===================
+    // Public view functions
     public fun get_school_balance(school: &School) : u64 {
         balance::value(&school.balance)
     }
@@ -126,8 +124,8 @@ module school_monitor::school_management {
         student.fees_paid
     }
 
-    public fun get_fee_amount(school: &School, ctx: &mut TxContext) : u64 {
-        let fee = table::borrow(&school.fees, sender(ctx));
+    public fun get_fee_amount(school: &School, student_id: ID) : u64 {
+        let fee = table::borrow(&school.fees, student_id); // Borrowing fee based on student id
         fee.amount
     }
 }

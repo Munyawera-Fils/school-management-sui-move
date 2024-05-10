@@ -1,8 +1,8 @@
-# school-management-sui-move
+# School-management-sui-move
 
 The School Management Smart Contract is a decentralized application (DApp) built on the SUI (Move) programming language for the Move blockchain. It provides a comprehensive solution for managing various aspects of a school, including student enrollment, attendance tracking, fee management, and more.
 
-Features:
+**Features:**
 
 Student Enrollment: Allows administrators to register new students, storing their personal information such as name, age, gender, and contact details.
 

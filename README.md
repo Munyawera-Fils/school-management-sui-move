@@ -5,12 +5,18 @@ The School Management Smart Contract is a decentralized application (DApp) built
 Features:
 
 Student Enrollment: Allows administrators to register new students, storing their personal information such as name, age, gender, and contact details.
+
 Attendance Tracking: Enables teachers to mark attendance for students, keeping track of their attendance records securely on the blockchain.
+
 Fee Management: Facilitates the collection of fees from students and tracks their payment status. It generates detailed bills for students and records payment transactions.
+
 Academic Records: Stores academic records such as grades, exam results, and class assignments securely on the blockchain.
+
 User Permissions: Implements role-based access control, allowing administrators, teachers, and students to access specific functionalities based on their roles.
+
 Testing Environment: Provides a testing environment with predefined scenarios for testing the functionality of the smart contract.
 Usage:
+
 
 The School Management Smart Contract can be deployed on a blockchain network supporting the Move programming language, such as the SUI blockchain. Schools and educational institutions can leverage this smart contract to streamline administrative processes, enhance transparency, and improve data security.
 

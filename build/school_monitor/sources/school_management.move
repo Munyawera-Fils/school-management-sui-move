@@ -17,7 +17,7 @@ module school_monitor::school_management {
     // School Structure
     struct School has key, store {
         id: UID,
-        students: Table<address, bool>,
+        students: Table<address, Student>,
         name: String,
         location: String,
         contact_info: String,
@@ -32,7 +32,7 @@ module school_monitor::school_management {
     }
 
     // Student Structure
-    struct Student has key {
+    struct Student has key, store {
         id: UID,
         school: ID,
         for: address,
@@ -41,7 +41,7 @@ module school_monitor::school_management {
         gender: String,
         contact_info: String,
         admission_date: u64,
-        fees_paid: bool
+        pay_count: u64
     }
 
     // Create a new school
@@ -66,7 +66,7 @@ module school_monitor::school_management {
     }
 
     // // Enroll a student
-    public fun new_student(school: ID, name: String, age: u64, gender: String, contact_info: String, date: u64, c: &Clock, ctx: &mut TxContext): Student {
+    public fun new_student(school: ID, name: String, age: u64, gender: String, contact_info: String, c: &Clock, ctx: &mut TxContext): Student {
         assert!(gender == string::utf8(b"MALE") || gender == string::utf8(b"FAMALE"), ERROR_INVALID_GENDER);        
         let id_ = object::new(ctx);
         let for_ = object::uid_to_address(&id_); // we will use the object id's address for table key 
@@ -78,22 +78,33 @@ module school_monitor::school_management {
             age,
             gender,
             contact_info,
-            admission_date: timestamp_ms(c) + date,
-            fees_paid: false
+            admission_date: timestamp_ms(c),
+            pay_count: 0
         }
     }
     // enroll the students
-    public fun enroll(self: &mut School, student: &mut Student, coin: Coin<SUI>) {
+    public fun enroll(self: &mut School, student:Student, coin: Coin<SUI>) {
         assert!(coin::value(&coin) == self.price, ERROR_INSUFFICIENT_FUNDS);
         coin::put(&mut self.balance, coin);
-        table::add(&mut self.students, student.for, true);
+        table::add(&mut self.students, student.for, student);
     }
 
-    public fun remove(cap: &SchoolCap, school: &mut School, student: address) {
+    public fun remove(cap: &SchoolCap, school: &mut School, student_: address, c:&Clock) {
         assert!(cap.school == object::id(school), ERROR_INVALID_ACCESS);
-        table::remove(&mut school.students, student);
+        let student = table::borrow(&school.students, student_);
+        if((timestamp_ms(c) - (student.admission_date)) / ((86400 * 30)) + 1 > student.pay_count) {
+            let student = table::remove(&mut school.students, student_);
+            destroy(student);
+        }
+        
     }
 
+    public fun deposit(self: &mut School, student: &mut Student, coin: Coin<SUI>) {
+        assert!(coin::value(&coin) == self.price, ERROR_INSUFFICIENT_FUNDS);
+        assert!(table::contains(&self.students, student.for), ERROR_INVALID_ACCESS);
+        coin::put(&mut self.balance, coin);
+        student.pay_count = student.pay_count + 1;
+    }
 
     public fun withdraw(cap: &SchoolCap, school: &mut School, ctx: &mut TxContext) : Coin<SUI> {
         assert!(cap.school == object::id(school), ERROR_INVALID_ACCESS);
@@ -102,12 +113,24 @@ module school_monitor::school_management {
         coin_
     }
 
+    public fun destroy(student: Student) {
+        let Student {
+            id,
+            school: _,
+            for: _,
+            name: _,
+            age: _,
+            gender: _,
+            contact_info: _,
+            admission_date: _,
+            pay_count: _
+
+        } = student;
+        object::delete(id);
+    }
+
     // // =================== Public view functions ===================
     public fun get_school_balance(school: &School) : u64 {
         balance::value(&school.balance)
-    }
-
-    public fun get_student_fee_status(student: &Student) : bool {
-        student.fees_paid
     }
 }
